@@ -7,7 +7,7 @@ const { SerialPort } = require("serialport");
 const { ReadlineParser } = require("@serialport/parser-readline");
 
 
-const Usuario = moongose.model("Usuario");
+const Usuario = moongose.model("Usuario"); //nombre de la coleccion de bd
 const arduinoPort = "COM8";
 const arduinoSerialPort = new SerialPort({ path: arduinoPort, baudRate: 9600 });
 const parser = arduinoSerialPort.pipe(new ReadlineParser({ delimiter: "\r\n" }));
@@ -19,6 +19,21 @@ let username = "";
 router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
+
+
+// Ruta para obtener los nombres de los usuarios
+router.get('/usuarios', async (req, res) => {
+  try {
+    // Trae solo los nombres de los usuarios
+    const usuarios = await Usuario.find({}, 'username'); // 'nombre' es el campo que contiene el nombre
+    res.json(usuarios);
+  } catch (error) {
+    console.error('Error al obtener los usuarios:', error);
+    res.status(500).send('Error al obtener los datos');
+  }
+});
+
+
 
 //Ruta para el inicio de sesion
 router.post('/login', async (req, res) => {
