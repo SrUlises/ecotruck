@@ -5,17 +5,18 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors');
 
+
 const mongoose = require("mongoose");
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/ecotruck", {})
+  .connect("mongodb://127.0.0.1:27017/proyect1", {})// este nombre es el de mi base de datos 
   .then(() => console.log("Conexión exitosa a MongoDB"))
   .catch((err) => console.log("Error al conectar a MongoDB", err));
 
 
 //importacion de modelos 
-require("./model/usuario");
 require("./model/material");
+require("./model/usuario");
 
 
 

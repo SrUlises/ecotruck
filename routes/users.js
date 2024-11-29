@@ -7,7 +7,7 @@ const { SerialPort } = require("serialport");
 const { ReadlineParser } = require("@serialport/parser-readline");
 
 
-const Usuario = moongose.model("Usuario"); //nombre de la coleccion de bd
+const users = moongose.model("users"); //nombre de la coleccion de bd
 const arduinoPort = "COM8";
 const arduinoSerialPort = new SerialPort({ path: arduinoPort, baudRate: 9600 });
 const parser = arduinoSerialPort.pipe(new ReadlineParser({ delimiter: "\r\n" }));
@@ -25,7 +25,7 @@ router.get('/', function (req, res, next) {
 router.get('/usuarios', async (req, res) => {
   try {
     // Trae solo los nombres de los usuarios
-    const usuarios = await Usuario.find({}, 'username'); // 'nombre' es el campo que contiene el nombre
+    const usuarios = await users.find({}, 'name:', 'position:  '); // 'nombre' es el campo que contiene el nombre
     res.json(usuarios);
   } catch (error) {
     console.error('Error al obtener los usuarios:', error);
@@ -35,39 +35,29 @@ router.get('/usuarios', async (req, res) => {
 
 
 
-//Ruta para el inicio de sesion
+// Ruta para manejo de inicio de sesión, voy a pegarle algo aqui 
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Se requieren nombre de usuario y contraseña' });
-  }
-
   try {
-    const user = await Usuario.findOne({ username });
+    const { name, password } = req.body;
 
+    // Buscar al usuario en la base de datos
+    const user = await users.findOne({ name });
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    // Verificar si la contraseña está encriptada
-    let isMatch;
-    if (user.password.startsWith('$2b$')) {
-      isMatch = await bcrypt.compare(password, user.password); // Comparar encriptada
-    } else {
-      isMatch = user.password === password; // Comparar en texto plano
-    }
-
-    if (!isMatch) {
+    // Comparar la contraseña proporcionada con la almacenada
+    if (user.password !== password) {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
+    // Respuesta exitosa
     res.status(200).json({
       message: 'Inicio de sesión exitoso',
       user: {
         id: user._id,
-        username: user.username,
-        email: user.email,
+        name: user.name,
+        position: user.position
       },
     });
   } catch (error) {
@@ -75,8 +65,6 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
-
-
 // Apertura del puerto COM8
 
 arduinoSerialPort.on("open", function (err) {

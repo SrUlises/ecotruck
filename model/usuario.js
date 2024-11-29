@@ -1,9 +1,10 @@
 const { default: mongoose } = require("mongoose");
 const moongose = require("mongoose");
 
-const UsuarioSchema = moongose.Schema({
-    username: String,
+const usersSchema = moongose.Schema({
+    name: String,
     password: String,
+    position: String
 });
 
-mongoose.model('Usuario', UsuarioSchema);
+mongoose.model('users', usersSchema); 

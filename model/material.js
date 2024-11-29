@@ -11,4 +11,4 @@ const MaterialSchema = mongoose.Schema({
     observaciones: { type: String },
 });
 
-module.exports = mongoose.model("Material", MaterialSchema);
+module.exports = mongoose.model("materials", MaterialSchema);
