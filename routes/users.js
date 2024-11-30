@@ -22,16 +22,31 @@ router.get('/', function (req, res, next) {
 
 
 // Ruta para obtener los nombres de los usuarios
-router.get('/usuarios', async (req, res) => {
+// Nueva ruta para obtener el nombre y posición por nombre de usuario
+router.get('/user/:name', async (req, res) => {
   try {
-    // Trae solo los nombres de los usuarios
-    const usuarios = await users.find({}, 'name:', 'position:  '); // 'nombre' es el campo que contiene el nombre
-    res.json(usuarios);
+    const { name } = req.params;
+
+    // Buscar el usuario por nombre
+    const user = await users.findOne({ name }, 'name position');
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Responder con los datos del usuario
+    res.status(200).json({
+      message: 'Datos del usuario obtenidos con éxito',
+      user: {
+        name: user.name,
+        position: user.position
+      },
+    });
   } catch (error) {
-    console.error('Error al obtener los usuarios:', error);
-    res.status(500).send('Error al obtener los datos');
+    console.error('Error al obtener los datos del usuario:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
+
 
 
 
