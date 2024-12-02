@@ -27,8 +27,8 @@ router.get('/user/:name', async (req, res) => {
   try {
     const { name } = req.params;
 
-    // Buscar el usuario por nombre
-    const user = await users.findOne({ name }, 'name position');
+    // Buscar el usuario por nombre y obtener los campos necesarios
+    const user = await users.findOne({ name }, 'name position email code');
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
@@ -38,7 +38,9 @@ router.get('/user/:name', async (req, res) => {
       message: 'Datos del usuario obtenidos con éxito',
       user: {
         name: user.name,
-        position: user.position
+        position: user.position,
+        email: user.email,
+        code: user.code
       },
     });
   } catch (error) {
@@ -46,6 +48,7 @@ router.get('/user/:name', async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
+
 
 
 
@@ -61,6 +64,10 @@ router.post('/login', async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
+    if (user.status === 0){
+      return res.status(403).json({message: 'Tu cuenta esta desactivada. No puedes iniciar sesion'});
+    }
+
     // Comparar la contraseña proporcionada con la almacenada
     if (user.password !== password) {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
@@ -72,7 +79,9 @@ router.post('/login', async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        position: user.position
+        position: user.position,
+        email: user.email,
+        code: user.code
       },
     });
   } catch (error) {

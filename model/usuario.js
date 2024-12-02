@@ -9,7 +9,10 @@ const usersSchema = moongose.Schema({
         match: /^[a-zA-Z\s]+$/ // Solo permite letras y espacios
     },
     password: String,
-    position: String
+    position: String,
+    code: String,
+    email: String,
+    status: Number
 });
 
 mongoose.model('users', usersSchema); 
